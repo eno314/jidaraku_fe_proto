@@ -1,0 +1,20 @@
+express メモ
+
+・expressインストール
+$ npm install -g express
+
+・プロジェクト作成
+$ express -e [プロジェクト名]
+-eオプションを付けることでテンプレートがejsになる
+
+・モジュールインストール     
+$ cd [プロジェクト名] && npm install
+
+・実行
+$ node app.js
+
+・ページ追加方法
+・・app.jsに以下を追記
+app.get('/detail', routes.[追加したいページ名]);
+
+・

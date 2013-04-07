@@ -38,43 +38,10 @@
                 itemTemp.css( 'position', 'absolute' );
                 itemTemp.css( 'top', ITEM_TEMP_TOP_INIT + 'px' );
                 itemTemp.css( 'height', ITEM_TEMP_HEIGHT_INIT + 'px' );
-                //itemTemp.css( 'width', ITEM_TEMP_WIDTH_INIT + 'px' );
+                itemTemp.css( 'width', ITEM_TEMP_WIDTH_INIT + 'px' );
                 itemTemp.css( 'background-color', ITEM_TEMP_COLOR );
-                
-                itemTempTop    = ITEM_TEMP_TOP_INIT,
-                itemTempHeight = ITEM_TEMP_HEIGHT_INIT;
 
                 return itemTemp;
-            },
-            
-            itemTempEventTouchstart = function() {
-            
-                event.preventDefault();
-                
-                itemTempBaseY = event.changedTouches[0].pageY,
-                itemTempDiffY = 0;
-            },
-            
-            itemTempEventTouchmove = function() {
-            
-                event.preventDefault();
-                
-                var dy = event.changedTouches[0].pageY - itemTempBaseY;
-
-                if ( ( itemTempTop + dy ) >= ITEM_TOP_MIN ) {
-
-                    itemTempDiffY = Math.floor( dy / ITEM_HEIGHT_MIN ) * ITEM_HEIGHT_MIN;
-                    item.css( 'top', itemTempTop + itemTempDiffY + 'px' );
-                }
-            },
-            
-            itemTempEventTouchend = function() {
-
-                itemTempTop += itemTempDiffY;
-                item.css( 'top', itemTempTop + 'px' );
-            },
-            
-            itemTempEventTap = function() {
             },
 
             mkMoveButtonArea = function() {
@@ -86,26 +53,64 @@
                 moveButton.css( 'height', MOVE_BUTTON_HEIGHT_INIT + 'px' );
                 moveButton.css( 'width', MOVE_BUTTON_WIDTH_INIT + 'px' );
                 moveButton.css( 'background-color', MOVE_BUTTON_COLOR );
-                
-                moveButtonTop = MOVE_BUTTON_TOP_INIT;
 
                 return moveButton;
-            },
+            };
+
+        // --------- 実処理部 ---------
+        
+        // --------- イベントリスナ ---------
+        
+        jQuery( '#addItem' ).bind( 'tap', function() {
+
+            itemTempTop    = ITEM_TEMP_TOP_INIT;
+            itemTempHeight = ITEM_TEMP_HEIGHT_INIT;
+
+            var item = mkItemTempArea();
+
+            item.bind( 'touchstart', function() {
+
+                event.preventDefault();
+                itemTempBaseY = event.changedTouches[0].pageY;
+
+                itemTempDiffY = 0;
+            } );
             
-            moveButtonEventTouchstart = function() {
+            item.bind( 'touchmove', function() {
             
                 event.preventDefault();
-                
-                moveButtonBaseY = event.changedTouches[0].pageY,
+                var dy = event.changedTouches[0].pageY - itemTempBaseY;
+
+                if ( ( itemTempTop + dy ) >= ITEM_TOP_MIN ) {
+
+                    itemTempDiffY = Math.floor( dy / ITEM_HEIGHT_MIN ) * ITEM_HEIGHT_MIN;
+                    item.css( 'top', itemTempTop + itemTempDiffY + 'px' );
+                }
+            } );
+
+            item.bind( 'touchend', function() {
+
+                itemTempTop += itemTempDiffY;
+                item.css( 'top', itemTempTop + 'px' );
+            } );
+
+            moveButtonTop = MOVE_BUTTON_TOP_INIT;
+            
+            var moveButton = mkMoveButtonArea();
+            
+            moveButton.bind( 'touchstart', function() {
+            
+                event.preventDefault();
+                moveButtonBaseY = event.changedTouches[0].pageY;
+
                 moveButtonDiffY = 0;
 
                 return false;
-            },
+            } );
             
-            moveButtonEventTouchmove = function() {
+            moveButton.bind( 'touchmove', function() {
             
                 event.preventDefault();
-                
                 var dy = event.changedTouches[0].pageY - moveButtonBaseY;
 
                 if ( ( itemTempHeight + dy ) >= ITEM_HEIGHT_MIN ) {
@@ -117,9 +122,9 @@
                 }
 
                 return false;
-            },
-            
-            moveButtonEventTouchend = function() {
+            } );
+
+            moveButton.bind( 'touchend', function() {
 
                 itemTempHeight += moveButtonDiffY;
                 item.css( 'height', itemTempHeight + 'px' );
@@ -128,27 +133,11 @@
                 moveButton.css( 'top', moveButtonTop + 'px' );
 
                 return false;
-            };
-
-        // --------- 実処理部 ---------
-        
-        // --------- イベントリスナ ---------
-        
-        jQuery( '#addItem' ).bind( 'tap', function() {
-
-            // itemTempの描画とイベント作成
-            var itemTemp = mkItemTempArea();
-            itemTemp.bind( 'touchstart', itemTempEventTouchstart );
-            itemTemp.bind( 'touchmove', itemTempEventTouchmove );
-            itemTemp.bind( 'touchend', itemTempEventTouchend );
-
-            var moveButton = mkMoveButtonArea();
-            moveButton.bind( 'touchstart', moveButtonEventTouchstart );
-            moveButton.bind( 'touchmove', moveButtonEventTouchmove );
-            moveButton.bind( 'touchend', moveButtonEventTouchend );
+            } );
             
-            itemTemp.append( moveButton );
-            itemTemp.bind( 'tap', function() {
+            item.append( moveButton );
+
+            item.bind( 'tap', function() {
 
                 item.css( 'background-color', 'rgba( 255, 0, 0, 1 )' );
             
